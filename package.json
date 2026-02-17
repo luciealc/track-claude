@@ -1,0 +1,70 @@
+{
+  "name": "claude-code-tracker",
+  "displayName": "Claude Code Activity Tracker",
+  "description": "Monitor Claude Code token usage, model selection, and session status from local logs",
+  "version": "0.1.0",
+  "publisher": "aloccluce",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "claudeTracker.showDashboard",
+        "title": "Claude Tracker: Show Dashboard"
+      },
+      {
+        "command": "claudeTracker.refresh",
+        "title": "Claude Tracker: Refresh Usage"
+      }
+    ],
+    "configuration": {
+      "title": "Claude Code Activity Tracker",
+      "properties": {
+        "claudeTracker.planType": {
+          "type": "string",
+          "default": "max",
+          "enum": [
+            "pro",
+            "max"
+          ],
+          "enumDescriptions": [
+            "Pro plan ($20/month)",
+            "Max plan ($100/month)"
+          ],
+          "description": "Your Anthropic subscription plan type, used to set the token ceiling."
+        },
+        "claudeTracker.refreshRate": {
+          "type": "number",
+          "default": 10,
+          "minimum": 2,
+          "maximum": 300,
+          "description": "How often (in seconds) to scan Claude logs for updates."
+        },
+        "claudeTracker.customLogPath": {
+          "type": "string",
+          "default": "",
+          "description": "Override the default ~/.claude/projects/ log path. Leave empty for auto-detection."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.0"
+  }
+}

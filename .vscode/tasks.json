@@ -1,0 +1,26 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "shell": {
+      "executable": "wsl.exe",
+      "args": ["-e", "bash", "-c"]
+    }
+  },
+  "tasks": [
+    {
+      "type": "shell",
+      "command": "cd /home/aloccluce/Projects/track-claude && npm run compile",
+      "group": "build",
+      "problemMatcher": ["$tsc"],
+      "label": "npm: compile"
+    },
+    {
+      "type": "shell",
+      "command": "cd /home/aloccluce/Projects/track-claude && npm run watch",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": ["$tsc-watch"],
+      "label": "npm: watch"
+    }
+  ]
+}
