@@ -80,8 +80,10 @@ export function activate(context: vscode.ExtensionContext): void {
 
   // Auto-detect plan type from credentials
   detectedPlanType = detectPlanType();
-  if (detectedPlanType) {
+  const previousPlan = context.globalState.get<string>('detectedPlanType');
+  if (detectedPlanType && detectedPlanType !== previousPlan) {
     vscode.window.showInformationMessage(`Claude Tracker: Detected ${detectedPlanType.toUpperCase()} plan.`);
+    context.globalState.update('detectedPlanType', detectedPlanType);
   }
 
   // Initial data load
