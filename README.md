@@ -27,7 +27,7 @@ Reads local `.jsonl` log files from `~/.claude/projects/` using:
 | `claudeTracker.refreshRate` | `10` | Seconds between log scans |
 | `claudeTracker.customLogPath` | `""` | Override default log directory |
 
-See [CONFIGURATION.md](CONFIGURATION.md) for detailed documentation on each setting.
+See `CONFIGURATION.md` in the project root for detailed documentation on each setting.
 
 ## Commands
 
@@ -82,7 +82,7 @@ The extension is installed locally as a `.vsix` package. No marketplace publishi
    code --install-extension "C:\Users\alocc\claude-code-tracker-<version>.vsix"
    ```
 
-   Replace `<version>` with the version in `package.json` (currently `0.3.0`).
+   Replace `<version>` with the version in `package.json` (currently `1.0.0`).
 
 5. **Reload VS Code** — `Ctrl+Shift+P` → "Reload Window"
 
@@ -98,7 +98,7 @@ Re-run steps 2–5. Bump the `version` in `package.json` before packaging if VS 
 cd /home/aloccluce/Projects/track-claude \
   && npx @vscode/vsce package --allow-missing-repository \
   && cp claude-code-tracker-*.vsix /mnt/c/Users/alocc/ \
-  && code --install-extension "C:\Users\alocc\claude-code-tracker-0.3.0.vsix"
+  && code --install-extension "C:\Users\alocc\claude-code-tracker-1.0.0.vsix"
 ```
 
 Then reload VS Code.
