@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { AggregatedUsage, PLAN_LIMITS, WINDOW_MS } from './types';
+import { MessageCounts } from './messageCounter';
 
 export class StatusBarManager {
   private statusBarItem: vscode.StatusBarItem;
@@ -15,7 +16,7 @@ export class StatusBarManager {
     this.statusBarItem.show();
   }
 
-  update(aggregated: AggregatedUsage, planType: string): void {
+  update(aggregated: AggregatedUsage, planType: string, messages?: MessageCounts): void {
     const limit = PLAN_LIMITS[planType] || PLAN_LIMITS.max;
     const usagePercent = Math.min((aggregated.totalTokens / limit) * 100, 100);
     const resetTime = this.formatResetTime(aggregated.oldestEntryTime);
@@ -35,7 +36,7 @@ export class StatusBarManager {
     }
 
     // Detailed tooltip
-    this.statusBarItem.tooltip = [
+    const tooltipLines = [
       `Claude Code Activity Tracker`,
       `──────────────────────`,
       `Input tokens: ${aggregated.totalInputTokens.toLocaleString()}`,
@@ -47,9 +48,19 @@ export class StatusBarManager {
       `Usage: ${usagePercent.toFixed(1)}%`,
       `Plan: ${planType.toUpperCase()}`,
       `Window resets: ${resetTime}`,
-      `──────────────────────`,
-      `Click to open dashboard`,
-    ].join('\n');
+    ];
+
+    if (messages) {
+      tooltipLines.push(
+        `──────────────────────`,
+        `All-time messages: ${messages.totalMessages.toLocaleString()}`,
+        `  You: ${messages.userMessages.toLocaleString()}`,
+        `  Claude: ${messages.assistantMessages.toLocaleString()}`,
+      );
+    }
+
+    tooltipLines.push(`──────────────────────`, `Click to open dashboard`);
+    this.statusBarItem.tooltip = tooltipLines.join('\n');
   }
 
   private formatTokenCount(count: number): string {

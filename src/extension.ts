@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { getClaudeLogDir, discoverLogFiles } from './logDiscovery';
 import { parseNewEntries, aggregateWindow, computeDailyUsage, resetOffsets } from './tokenAggregator';
+import { countMessages, resetMessageCounts, MessageCounts } from './messageCounter';
 import { StatusBarManager } from './statusBar';
 import { DashboardPanel } from './webviewDashboard';
 import { detectPlanType } from './planDetector';
@@ -11,6 +12,7 @@ let pollInterval: ReturnType<typeof setInterval> | undefined;
 let fileWatcher: vscode.FileSystemWatcher | undefined;
 let allEntries: UsageEntry[] = [];
 let detectedPlanType: string | undefined;
+let lifetimeMessages: MessageCounts = { userMessages: 0, assistantMessages: 0, totalMessages: 0 };
 
 export function activate(context: vscode.ExtensionContext): void {
   statusBar = new StatusBarManager();
@@ -27,6 +29,7 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand('claudeTracker.refresh', () => {
       resetOffsets();
+      resetMessageCounts();
       allEntries = [];
       refreshData();
       vscode.window.showInformationMessage('Claude Tracker: Refreshed usage data.');
@@ -108,8 +111,12 @@ function refreshData(): void {
     allEntries.push(...newEntries);
   }
 
+  // Count all-time messages (scans all files, not just 24h)
+  const allLogFiles = discoverLogFiles(logDir, Infinity);
+  lifetimeMessages = countMessages(allLogFiles);
+
   const aggregated = aggregateWindow(allEntries);
-  statusBar.update(aggregated, planType);
+  statusBar.update(aggregated, planType, lifetimeMessages);
 
   // Update dashboard if it's open
   if (DashboardPanel.currentPanel) {
@@ -123,7 +130,7 @@ function updateDashboard(panel: DashboardPanel): void {
   const aggregated = aggregateWindow(allEntries);
   const dailyUsage = computeDailyUsage(allEntries);
 
-  panel.update(aggregated, dailyUsage, planType);
+  panel.update(aggregated, dailyUsage, planType, lifetimeMessages);
 }
 
 export function deactivate(): void {

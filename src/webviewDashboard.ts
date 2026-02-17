@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { AggregatedUsage, DailyUsage, PLAN_LIMITS, WINDOW_MS } from './types';
+import { MessageCounts } from './messageCounter';
 
 export class DashboardPanel {
   public static currentPanel: DashboardPanel | undefined;
@@ -34,16 +35,17 @@ export class DashboardPanel {
     return DashboardPanel.currentPanel;
   }
 
-  update(aggregated: AggregatedUsage, dailyUsage: DailyUsage[], planType: string): void {
+  update(aggregated: AggregatedUsage, dailyUsage: DailyUsage[], planType: string, messages?: MessageCounts): void {
     const limit = PLAN_LIMITS[planType] || PLAN_LIMITS.max;
-    this.panel.webview.html = this.getHtml(aggregated, dailyUsage, planType, limit);
+    this.panel.webview.html = this.getHtml(aggregated, dailyUsage, planType, limit, messages);
   }
 
   private getHtml(
     aggregated: AggregatedUsage,
     dailyUsage: DailyUsage[],
     planType: string,
-    limit: number
+    limit: number,
+    messages?: MessageCounts
   ): string {
     const usagePercent = Math.min((aggregated.totalTokens / limit) * 100, 100);
     const modelData = Array.from(aggregated.modelBreakdown.entries()).map(([model, tokens]) => ({
@@ -320,6 +322,24 @@ export class DashboardPanel {
         <div class="stat">
           <div class="stat-value">${aggregated.modelBreakdown.size}</div>
           <div class="stat-label">Models Used</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>All-Time Messages</h2>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-value">${messages ? messages.totalMessages.toLocaleString() : '--'}</div>
+          <div class="stat-label">Total Exchanged</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">${messages ? messages.userMessages.toLocaleString() : '--'}</div>
+          <div class="stat-label">You</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">${messages ? messages.assistantMessages.toLocaleString() : '--'}</div>
+          <div class="stat-label">Claude</div>
         </div>
       </div>
     </div>

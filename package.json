@@ -2,7 +2,7 @@
   "name": "claude-code-tracker",
   "displayName": "Claude Code Activity Tracker",
   "description": "Monitor Claude Code token usage, model selection, and session status from local logs",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "publisher": "aloccluce",
   "engines": {
     "vscode": "^1.85.0"
