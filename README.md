@@ -5,9 +5,11 @@ VS Code extension that monitors local Claude Code activity to provide real-time 
 ## Features
 
 - **Live Status Bar** - Token usage percentage with color-coded thresholds (green/yellow/red)
-- **Webview Dashboard** - 7-day bar charts, model distribution pie chart, countdown timer
+- **Webview Dashboard** - 7-day bar charts with hover tooltips, model distribution pie chart, countdown timer
 - **5-Hour Rolling Window** - Tracks Anthropic's rolling usage window with reset countdown
+- **All-Time Message Counter** - Lifetime count of all messages exchanged with Claude
 - **Model Tracking** - See which models (Opus, Sonnet, Haiku) are being used
+- **Auto Plan Detection** - Reads your subscription type (Pro/Max) from Claude credentials
 - **Privacy-First** - Only reads usage/model fields, never touches prompt content
 
 ## How It Works
@@ -21,9 +23,11 @@ Reads local `.jsonl` log files from `~/.claude/projects/` using:
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `claudeTracker.planType` | `max` | `pro` ($20) or `max` ($100) - sets token ceiling |
+| `claudeTracker.planType` | `auto` | `auto`, `pro` ($20), or `max` ($100) - sets token ceiling |
 | `claudeTracker.refreshRate` | `10` | Seconds between log scans |
 | `claudeTracker.customLogPath` | `""` | Override default log directory |
+
+See [CONFIGURATION.md](CONFIGURATION.md) for detailed documentation on each setting.
 
 ## Commands
 
@@ -75,8 +79,10 @@ The extension is installed locally as a `.vsix` package. No marketplace publishi
 4. **Install into VS Code**:
 
    ```bash
-   code --install-extension 'C:\Users\alocc\claude-code-tracker-0.1.0.vsix'
+   code --install-extension "C:\Users\alocc\claude-code-tracker-<version>.vsix"
    ```
+
+   Replace `<version>` with the version in `package.json` (currently `0.3.0`).
 
 5. **Reload VS Code** — `Ctrl+Shift+P` → "Reload Window"
 
@@ -92,7 +98,7 @@ Re-run steps 2–5. Bump the `version` in `package.json` before packaging if VS 
 cd /home/aloccluce/Projects/track-claude \
   && npx @vscode/vsce package --allow-missing-repository \
   && cp claude-code-tracker-*.vsix /mnt/c/Users/alocc/ \
-  && code --install-extension 'C:\Users\alocc\claude-code-tracker-0.1.0.vsix'
+  && code --install-extension "C:\Users\alocc\claude-code-tracker-0.3.0.vsix"
 ```
 
 Then reload VS Code.

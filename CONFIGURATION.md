@@ -121,7 +121,7 @@ These are not settings, but available via the Command Palette (`Ctrl+Shift+P`):
 
 | Command | Description |
 |---------|-------------|
-| `Claude Tracker: Show Dashboard` | Opens the webview dashboard with charts, model breakdown, and countdown timer |
+| `Claude Tracker: Show Dashboard` | Opens the webview dashboard with charts, model breakdown, countdown timer, and all-time message count |
 | `Claude Tracker: Refresh Usage` | Clears cached data and re-scans all log files from scratch |
 
 ### When to use Refresh
@@ -150,3 +150,24 @@ $(pulse) Claude: 3.9M / 45.0M (8.6%) | Reset: 3h 42m
 | Red background | 85-100% | Near or at limit |
 
 Click the status bar item to open the full dashboard.
+
+### Tooltip
+
+Hover over the status bar item to see a detailed breakdown including:
+- Input, output, cache creation, and cache read tokens
+- Total tokens vs. plan limit
+- Current plan and usage percentage
+- Window reset countdown
+- All-time message counts (your messages and Claude's responses)
+
+## Dashboard
+
+The webview dashboard (`Claude Tracker: Show Dashboard`) includes:
+
+- **Usage meter** with percentage in the header, color-coded by threshold
+- **Token breakdown** cards for the current 5-hour window
+- **Countdown timer** showing when the oldest tokens in the window expire
+- **7-day usage chart** with hover tooltips showing per-day input/output/cache breakdown
+- **Model distribution** pie chart for the current window
+- **Session info** with API call count and models used
+- **All-time messages** with total, your messages, and Claude's responses
