@@ -317,13 +317,12 @@ export class DashboardPanel {
 
   <div class="grid">
     <div class="card usage-meter">
-      <h2>Token Usage (5-Hour Window) &mdash; ${planType.toUpperCase()} Plan</h2>
+      <h2>Token Usage (5-Hour Window) &mdash; ${planType.toUpperCase()} Plan &mdash; <span style="color: ${this.getColor(usagePercent)};">${usagePercent.toFixed(1)}%</span></h2>
       <div class="meter-bar">
         <div class="meter-fill" style="width: ${usagePercent}%; background: ${this.getColor(usagePercent)};"></div>
       </div>
       <div class="meter-label">
         <span>${this.formatTokens(aggregated.totalTokens)} used</span>
-        <span>${usagePercent.toFixed(1)}%</span>
         <span>${this.formatTokens(limit)} limit</span>
       </div>
     </div>
