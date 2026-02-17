@@ -1,15 +1,16 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import { getClaudeLogDir, discoverLogFiles } from './logDiscovery';
 import { parseNewEntries, aggregateWindow, computeDailyUsage, resetOffsets } from './tokenAggregator';
 import { StatusBarManager } from './statusBar';
 import { DashboardPanel } from './webviewDashboard';
+import { detectPlanType } from './planDetector';
 import { UsageEntry } from './types';
 
 let statusBar: StatusBarManager;
 let pollInterval: ReturnType<typeof setInterval> | undefined;
 let fileWatcher: vscode.FileSystemWatcher | undefined;
 let allEntries: UsageEntry[] = [];
+let detectedPlanType: string | undefined;
 
 export function activate(context: vscode.ExtensionContext): void {
   statusBar = new StatusBarManager();
@@ -74,14 +75,29 @@ export function activate(context: vscode.ExtensionContext): void {
     })
   );
 
+  // Auto-detect plan type from credentials
+  detectedPlanType = detectPlanType();
+  if (detectedPlanType) {
+    vscode.window.showInformationMessage(`Claude Tracker: Detected ${detectedPlanType.toUpperCase()} plan.`);
+  }
+
   // Initial data load
   refreshData();
+}
+
+function getEffectivePlanType(): string {
+  const config = vscode.workspace.getConfiguration('claudeTracker');
+  const configured = config.get<string>('planType') || 'auto';
+  if (configured !== 'auto') {
+    return configured;
+  }
+  return detectedPlanType || 'pro';
 }
 
 function refreshData(): void {
   const config = vscode.workspace.getConfiguration('claudeTracker');
   const customPath = config.get<string>('customLogPath') || '';
-  const planType = config.get<string>('planType') || 'max';
+  const planType = getEffectivePlanType();
 
   const logDir = getClaudeLogDir(customPath || undefined);
   const logFiles = discoverLogFiles(logDir);
@@ -102,8 +118,7 @@ function refreshData(): void {
 }
 
 function updateDashboard(panel: DashboardPanel): void {
-  const config = vscode.workspace.getConfiguration('claudeTracker');
-  const planType = config.get<string>('planType') || 'max';
+  const planType = getEffectivePlanType();
 
   const aggregated = aggregateWindow(allEntries);
   const dailyUsage = computeDailyUsage(allEntries);

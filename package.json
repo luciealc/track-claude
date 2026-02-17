@@ -2,7 +2,7 @@
   "name": "claude-code-tracker",
   "displayName": "Claude Code Activity Tracker",
   "description": "Monitor Claude Code token usage, model selection, and session status from local logs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "aloccluce",
   "engines": {
     "vscode": "^1.85.0"
@@ -30,16 +30,18 @@
       "properties": {
         "claudeTracker.planType": {
           "type": "string",
-          "default": "max",
+          "default": "auto",
           "enum": [
+            "auto",
             "pro",
             "max"
           ],
           "enumDescriptions": [
+            "Auto-detect from ~/.claude/.credentials.json",
             "Pro plan ($20/month)",
             "Max plan ($100/month)"
           ],
-          "description": "Your Anthropic subscription plan type, used to set the token ceiling."
+          "description": "Your Anthropic subscription plan type. 'auto' reads it from Claude credentials."
         },
         "claudeTracker.refreshRate": {
           "type": "number",
