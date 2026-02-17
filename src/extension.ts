@@ -103,7 +103,9 @@ function refreshData(): void {
   const planType = getEffectivePlanType();
 
   const logDir = getClaudeLogDir(customPath || undefined);
-  const logFiles = discoverLogFiles(logDir);
+  // Use 7-day window for file discovery to match the dashboard chart range
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+  const logFiles = discoverLogFiles(logDir, sevenDaysMs);
   const newEntries = parseNewEntries(logFiles);
 
   // Merge new entries, avoiding duplicates by timestamp+model

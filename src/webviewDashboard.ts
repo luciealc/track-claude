@@ -182,6 +182,16 @@ export class DashboardPanel {
       align-items: center;
       flex: 1;
       margin: 0 2px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .bar-group:hover .bar-stack {
+      opacity: 0.8;
+    }
+
+    .bar-group:hover .bar-tooltip {
+      display: block;
     }
 
     .bar-stack {
@@ -189,6 +199,7 @@ export class DashboardPanel {
       flex-direction: column-reverse;
       width: 100%;
       max-width: 40px;
+      transition: opacity 0.15s;
     }
 
     .bar-segment {
@@ -201,6 +212,60 @@ export class DashboardPanel {
       font-size: 0.7em;
       margin-top: 4px;
       opacity: 0.7;
+    }
+
+    .bar-tooltip {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--vscode-editorHoverWidget-background, #252526);
+      border: 1px solid var(--vscode-editorHoverWidget-border, #454545);
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 0.8em;
+      white-space: nowrap;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      pointer-events: none;
+    }
+
+    .bar-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--vscode-editorHoverWidget-border, #454545);
+    }
+
+    .bar-tooltip .tt-date {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .bar-tooltip .tt-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .bar-tooltip .tt-color {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    .bar-tooltip .tt-total {
+      margin-top: 4px;
+      padding-top: 4px;
+      border-top: 1px solid var(--border);
+      font-weight: bold;
     }
 
     .pie-container {
@@ -384,6 +449,13 @@ export class DashboardPanel {
 
     return `
       <div class="bar-group">
+        <div class="bar-tooltip">
+          <div class="tt-date">${day.date}</div>
+          <div class="tt-row"><span><span class="tt-color" style="background: var(--blue);"></span>Input</span><span>${this.formatTokens(day.inputTokens)}</span></div>
+          <div class="tt-row"><span><span class="tt-color" style="background: var(--green);"></span>Output</span><span>${this.formatTokens(day.outputTokens)}</span></div>
+          <div class="tt-row"><span><span class="tt-color" style="background: var(--purple);"></span>Cache</span><span>${this.formatTokens(day.cacheTokens)}</span></div>
+          <div class="tt-row tt-total"><span>Total</span><span>${this.formatTokens(day.totalTokens)}</span></div>
+        </div>
         <div class="bar-stack">
           <div class="bar-segment" style="height: ${inputH}px; background: var(--blue);"></div>
           <div class="bar-segment" style="height: ${outputH}px; background: var(--green);"></div>
