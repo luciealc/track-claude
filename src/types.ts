@@ -22,6 +22,8 @@ export interface AggregatedUsage {
   modelBreakdown: Map<string, number>;
   windowStart: Date;
   windowEnd: Date;
+  /** Timestamp of the oldest entry in the window (null if no entries). */
+  oldestEntryTime: Date | null;
   entries: UsageEntry[];
 }
 

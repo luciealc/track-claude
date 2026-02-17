@@ -51,7 +51,9 @@ export class DashboardPanel {
       tokens,
     }));
 
-    const resetAt = new Date(aggregated.windowStart.getTime() + WINDOW_MS);
+    const resetAt = aggregated.oldestEntryTime
+      ? new Date(aggregated.oldestEntryTime.getTime() + WINDOW_MS)
+      : new Date();
 
     return /*html*/ `<!DOCTYPE html>
 <html lang="en">

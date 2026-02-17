@@ -165,6 +165,15 @@ export function aggregateWindow(entries: UsageEntry[]): AggregatedUsage {
   const totalTokens = totalInputTokens + totalOutputTokens +
     totalCacheCreationTokens + totalCacheReadTokens;
 
+  // Find the oldest entry — its timestamp + 5h is when the first tokens expire
+  let oldestEntryTime: Date | null = null;
+  if (windowEntries.length > 0) {
+    oldestEntryTime = windowEntries.reduce(
+      (oldest, e) => e.timestamp < oldest ? e.timestamp : oldest,
+      windowEntries[0].timestamp
+    );
+  }
+
   return {
     totalInputTokens,
     totalOutputTokens,
@@ -174,6 +183,7 @@ export function aggregateWindow(entries: UsageEntry[]): AggregatedUsage {
     modelBreakdown,
     windowStart,
     windowEnd: now,
+    oldestEntryTime,
     entries: windowEntries,
   };
 }

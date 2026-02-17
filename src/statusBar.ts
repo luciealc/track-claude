@@ -18,7 +18,7 @@ export class StatusBarManager {
   update(aggregated: AggregatedUsage, planType: string): void {
     const limit = PLAN_LIMITS[planType] || PLAN_LIMITS.max;
     const usagePercent = Math.min((aggregated.totalTokens / limit) * 100, 100);
-    const resetTime = this.formatResetTime(aggregated.windowStart);
+    const resetTime = this.formatResetTime(aggregated.oldestEntryTime);
 
     const totalFormatted = this.formatTokenCount(aggregated.totalTokens);
     const limitFormatted = this.formatTokenCount(limit);
@@ -62,10 +62,14 @@ export class StatusBarManager {
     return count.toString();
   }
 
-  private formatResetTime(windowStart: Date): string {
-    const resetAt = new Date(windowStart.getTime() + WINDOW_MS);
-    const now = Date.now();
-    const diffMs = resetAt.getTime() - now;
+  private formatResetTime(oldestEntryTime: Date | null): string {
+    if (!oldestEntryTime) {
+      return 'no activity';
+    }
+
+    // The oldest entry expires (falls out of the window) at its timestamp + 5h
+    const expiresAt = oldestEntryTime.getTime() + WINDOW_MS;
+    const diffMs = expiresAt - Date.now();
 
     if (diffMs <= 0) {
       return 'now';
