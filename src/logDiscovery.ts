@@ -11,15 +11,52 @@ export interface LogFile {
 
 /**
  * Resolves the Claude projects log directory for the current platform.
+ * On Windows, also checks for WSL log paths since Claude Code typically runs in WSL.
  */
 export function getClaudeLogDir(customPath?: string): string {
   if (customPath) {
     return customPath;
   }
-  if (process.platform === 'win32') {
-    return path.join(os.homedir(), '.claude', 'projects');
+
+  // Native path (works for macOS, Linux, or Windows-native Claude Code)
+  const nativePath = path.join(os.homedir(), '.claude', 'projects');
+  if (fs.existsSync(nativePath)) {
+    return nativePath;
   }
-  return path.join(os.homedir(), '.claude', 'projects');
+
+  // On Windows, check common WSL distro paths via \\wsl.localhost\
+  if (process.platform === 'win32') {
+    const wslDistros = ['Ubuntu', 'Ubuntu-22.04', 'Ubuntu-24.04', 'Debian', 'kali-linux'];
+    const windowsUser = os.userInfo().username;
+
+    for (const distro of wslDistros) {
+      // Try matching the Windows username as the WSL username
+      const wslPath = path.join(`\\\\wsl.localhost\\${distro}\\home\\${windowsUser}`, '.claude', 'projects');
+      if (fs.existsSync(wslPath)) {
+        return wslPath;
+      }
+    }
+
+    // Brute-force: scan /home/* inside each distro for .claude/projects
+    for (const distro of wslDistros) {
+      const homesDir = `\\\\wsl.localhost\\${distro}\\home`;
+      try {
+        const users = fs.readdirSync(homesDir, { withFileTypes: true });
+        for (const user of users) {
+          if (!user.isDirectory()) { continue; }
+          const candidate = path.join(homesDir, user.name, '.claude', 'projects');
+          if (fs.existsSync(candidate)) {
+            return candidate;
+          }
+        }
+      } catch {
+        // Distro doesn't exist or isn't running
+      }
+    }
+  }
+
+  // Fallback to native path even if it doesn't exist yet
+  return nativePath;
 }
 
 /**
